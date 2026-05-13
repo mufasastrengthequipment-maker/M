@@ -1,0 +1,54 @@
+{
+  "name": "MUFASA STRENGTH EQUIPMENT",
+  "short_name": "MUFASA",
+  "description": "Kenya's #1 home gym equipment. Premium rubber dumbbells delivered nationwide.",
+  "start_url": "/index.html",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#050403",
+  "theme_color": "#D4942A",
+  "lang": "en",
+  "categories": ["shopping", "sports", "fitness"],
+  "icons": [
+    {
+      "src": "mufasa-header-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "mufasa-header-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "hero-bg.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "form_factor": "wide",
+      "label": "MUFASA Strength Equipment homepage"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Shop Dumbbells",
+      "short_name": "Shop",
+      "description": "Browse and order dumbbells",
+      "url": "/index.html#shop",
+      "icons": [{ "src": "mufasa-header-logo.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "My Account",
+      "short_name": "Account",
+      "description": "View your MUFASA membership",
+      "url": "/index.html#account",
+      "icons": [{ "src": "mufasa-header-logo.png", "sizes": "96x96" }]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
