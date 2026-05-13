@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Join MUFASA — Forge Your Legacy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --g:#D4942A; --gl:#F0B84A; --gd:#A8741F;
+  --gdim:rgba(212,148,42,.18); --gfaint:rgba(212,148,42,.07);
+  --bg:#050403; --s1:#0C0A08; --s2:#141008;
+  --card:#18150F; --card2:#1E1A10;
+  --b1:rgba(212,148,42,.13); --b2:rgba(212,148,42,.32); --b3:rgba(212,148,42,.55);
+  --w:#F4EFE4; --grey:#A09890; --dim:#7A7570;
+  --green:#22a050; --greenfaint:rgba(34,160,80,.12);
+  --red:#e05050; --redfaint:rgba(224,80,80,.10);
+  --r:6px; --r2:12px; --r3:20px;
+  --transition:.22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ── RESET ── */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Barlow',sans-serif;background:var(--bg);color:var(--w);overflow-x:hidden;min-height:100vh;}
+img{max-width:100%;height:auto;}
+button{font-family:inherit;cursor:pointer;}
+input,select,textarea{font-family:inherit;}
+
+/* ── CANVAS BG ── */
+#bgCanvas{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;opacity:.6;}
+
+/* ── LAYOUT ── */
+.page-wrap{position:relative;z-index:1;min-height:100vh;display:grid;grid-template-columns:1fr 1fr;max-width:1200px;margin:0 auto;}
+
+/* ── LEFT PANEL ── */
+.left-panel{padding:48px 48px 48px 32px;display:flex;flex-direction:column;justify-content:space-between;position:sticky;top:0;height:100vh;overflow:hidden;}
+.brand{display:flex;align-items:center;gap:12px;margin-bottom:auto;}
+.brand-icon{font-size:2rem;line-height:1;}
+.brand-name{font-family:'Anton',sans-serif;font-size:1.4rem;letter-spacing:.05em;color:var(--g);}
+.brand-tag{font-size:.7rem;color:var(--grey);letter-spacing:.18em;text-transform:uppercase;margin-top:2px;}
+
+.hero-copy{flex:1;display:flex;flex-direction:column;justify-content:center;padding:40px 0;}
+.eyebrow{font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.3em;text-transform:uppercase;color:var(--g);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.eyebrow::before{content:'';display:inline-block;width:24px;height:2px;background:var(--g);}
+.hero-h{font-family:'Anton',sans-serif;font-size:clamp(2.8rem,5vw,4.2rem);line-height:.92;color:var(--w);margin-bottom:20px;}
+.hero-h .gold{color:var(--g);display:block;}
+.hero-sub{font-size:.92rem;color:var(--grey);line-height:1.7;max-width:340px;margin-bottom:36px;}
+
+.perks{display:flex;flex-direction:column;gap:10px;margin-bottom:36px;}
+.perk{display:flex;align-items:center;gap:12px;font-size:.85rem;color:var(--grey);}
+.perk-ic{width:32px;height:32px;background:var(--gdim);border:1px solid var(--b2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;}
+.perk b{color:var(--w);font-weight:500;}
+
+/* Live counter */
+.live-bar{display:flex;align-items:center;gap:10px;background:var(--gdim);border:1px solid var(--b2);border-radius:20px;padding:8px 16px;font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:600;width:fit-content;}
+.live-dot{width:7px;height:7px;background:var(--green);border-radius:50%;animation:livepulse 2s ease infinite;}
+@keyframes livepulse{0%,100%{box-shadow:0 0 0 0 rgba(34,160,80,.6);}50%{box-shadow:0 0 0 6px rgba(34,160,80,0);}}
+.live-text{color:var(--gl);}
+.live-sub{color:var(--grey);font-weight:400;}
+
+/* Social proof strip */
+.proof-strip{margin-top:32px;padding-top:24px;border-top:1px solid var(--b1);}
+.proof-heads{display:flex;align-items:center;gap:-6px;margin-bottom:8px;}
+.ph{width:28px;height:28px;border-radius:50%;border:2px solid var(--bg);background:linear-gradient(135deg,var(--gd),var(--gl));display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:.62rem;color:var(--bg);margin-left:-6px;flex-shrink:0;}
+.ph:first-child{margin-left:0;}
+.proof-txt{font-size:.78rem;color:var(--grey);line-height:1.5;}
+.proof-txt b{color:var(--w);}
+.proof-stars{color:var(--g);font-size:.75rem;letter-spacing:2px;margin-bottom:4px;}
+
+/* ── RIGHT PANEL — FORM ── */
+.right-panel{padding:48px 32px 48px 48px;display:flex;flex-direction:column;justify-content:center;}
+.form-shell{background:var(--card);border:1px solid var(--b1);border-radius:var(--r3);overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.5),0 0 0 1px rgba(212,148,42,.06);}
+
+/* Progress bar */
+.prog-track{height:3px;background:var(--b1);position:relative;}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--gd),var(--gl));border-radius:2px;transition:width .5s cubic-bezier(.4,0,.2,1);}
+
+/* Step header */
+.step-header{padding:28px 28px 0;}
+.step-label{font-family:'Barlow Condensed',sans-serif;font-size:.7rem;font-weight:700;letter-spacing:.28em;text-transform:uppercase;color:var(--g);margin-bottom:7px;}
+.step-count{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.sc-num{font-family:'Anton',sans-serif;font-size:1.7rem;color:var(--w);line-height:1;}
+.sc-of{font-size:.75rem;color:var(--dim);margin-top:4px;}
+.step-title{font-family:'Anton',sans-serif;font-size:1.5rem;color:var(--w);line-height:1.05;margin-bottom:5px;}
+.step-sub{font-size:.82rem;color:var(--grey);line-height:1.6;}
+
+/* Step dots */
+.step-dots{display:flex;gap:6px;padding:16px 28px 0;}
+.sd{height:3px;border-radius:2px;background:var(--b1);transition:all .3s;flex:1;}
+.sd.done{background:var(--gd);}
+.sd.active{background:var(--gl);}
+
+/* Form body */
+.form-body{padding:24px 28px 28px;}
+
+/* Fields */
+.field{margin-bottom:16px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+label.fl{display:block;font-family:'Barlow Condensed',sans-serif;font-size:.72rem;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--grey);margin-bottom:5px;}
+.fi{width:100%;background:var(--s1);border:1.5px solid var(--b1);border-radius:var(--r);color:var(--w);padding:11px 13px;font-size:.9rem;outline:none;transition:border-color var(--transition),box-shadow var(--transition),background var(--transition);}
+.fi:focus{border-color:var(--g);box-shadow:0 0 0 3px rgba(212,148,42,.12);background:rgba(5,4,3,.8);}
+.fi.err{border-color:var(--red);box-shadow:0 0 0 3px var(--redfaint);}
+.fi.ok{border-color:var(--green);}
+.fi::placeholder{color:var(--dim);}
+select.fi{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%237A7570' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:calc(100% - 12px) center;}
+.ferr{font-size:.73rem;color:var(--red);margin-top:4px;min-height:16px;display:flex;align-items:center;gap:4px;}
+.ferr::before{content:'⚠';font-size:.65rem;}
+
+/* Goal cards */
+.goal-cards{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.gc{background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r2);padding:14px 12px;cursor:pointer;transition:all var(--transition);text-align:center;}
+.gc:hover{border-color:var(--b2);background:var(--card2);}
+.gc.sel{border-color:var(--g);background:var(--gdim);box-shadow:0 0 0 1px var(--g),0 4px 16px rgba(212,148,42,.15);}
+.gc-ic{font-size:1.6rem;margin-bottom:6px;}
+.gc-nm{font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;color:var(--w);}
+.gc-ds{font-size:.7rem;color:var(--grey);margin-top:2px;}
+
+/* DB selector */
+.db-selector{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.dbs{background:var(--s2);border:1.5px solid var(--b1);border-radius:var(--r);padding:8px 4px;cursor:pointer;transition:all var(--transition);text-align:center;font-family:'Barlow Condensed',sans-serif;font-size:.75rem;font-weight:700;}
+.dbs:hover{border-color:var(--b2);}
+.dbs.sel{border-color:var(--g);background:var(--gdim);color:var(--gl);}
+.dbs-kg{font-family:'Anton',sans-serif;font-size:1.1rem;color:var(--w);display:block;margin-bottom:2px;}
+
+/* Checkbox */
+.check-row{display:flex;align-items:flex-start;gap:10px;cursor:pointer;}
+.check-box{width:18px;height:18px;border:1.5px solid var(--b2);border-radius:4px;background:var(--s1);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px;transition:all var(--transition);}
+.check-box.on{background:var(--g);border-color:var(--g);}
+.check-box.on::after{content:'✓';font-size:.75rem;color:var(--bg);font-weight:700;}
+.check-txt{font-size:.82rem;color:var(--grey);line-height:1.5;}
+.check-txt a{color:var(--gl);}
+
+/* CTA button */
+.cta-btn{width:100%;padding:15px;background:linear-gradient(135deg,var(--gd),var(--gl));border:none;border-radius:var(--r);color:var(--bg);font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;transition:all var(--transition);box-shadow:0 6px 20px rgba(212,148,42,.3);position:relative;overflow:hidden;margin-top:8px;}
+.cta-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,var(--gl),var(--g));opacity:0;transition:opacity var(--transition);}
+.cta-btn:hover::before{opacity:1;}
+.cta-btn:hover{transform:translateY(-2px);box-shadow:0 12px 32px rgba(212,148,42,.45);}
+.cta-btn:active{transform:translateY(0);}
+.cta-btn span{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;gap:8px;}
+.cta-btn.loading{pointer-events:none;opacity:.8;}
+.cta-btn.loading span::after{content:'';width:16px;height:16px;border:2px solid rgba(0,0,0,.3);border-top-color:var(--bg);border-radius:50%;animation:spin .7s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+.back-btn{background:none;border:1px solid var(--b1);color:var(--grey);font-family:'Barlow Condensed',sans-serif;font-size:.78rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:8px 16px;border-radius:var(--r);transition:all var(--transition);margin-bottom:14px;}
+.back-btn:hover{border-color:var(--b2);color:var(--gl);}
+
+/* Security strip */
+.sec-strip{display:flex;justify-content:center;gap:16px;margin-top:14px;flex-wrap:wrap;}
+.sec-item{display:flex;align-items:center;gap:5px;font-size:.68rem;color:var(--dim);}
+
+/* Urgency banner */
+.urgency{background:linear-gradient(135deg,rgba(212,148,42,.08),rgba(168,116,31,.12));border:1px solid var(--b2);border-radius:var(--r);padding:10px 14px;margin-bottom:18px;display:flex;align-items:center;gap:10px;font-family:'Barlow Condensed',sans-serif;font-size:.8rem;}
+.urgency-ic{font-size:1.1rem;flex-shrink:0;}
+.urgency-txt{color:var(--gl);font-weight:600;}
+.urgency-sub{color:var(--grey);font-weight:400;}
+
+/* Divider */
+.or-divider{display:flex;align-items:center;gap:12px;margin:16px 0;font-size:.73rem;color:var(--dim);}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--b1);}
+
+/* WhatsApp alt */
+.wa-alt{display:flex;align-items:center;justify-content:center;gap:8px;background:var(--greenfaint);border:1px solid rgba(34,160,80,.25);border-radius:var(--r);padding:11px;color:#25d366;font-family:'Barlow Condensed',sans-serif;font-size:.82rem;font-weight:700;letter-spacing:.1em;text-decoration:none;transition:all var(--transition);}
+.wa-alt:hover{background:rgba(34,160,80,.2);}
+
+/* ── SUCCESS SCREEN ── */
+.success-screen{display:none;padding:40px 28px;text-align:center;}
+.success-screen.show{display:block;}
+.success-lion{font-size:4rem;animation:roar 1s ease both;}
+@keyframes roar{0%{transform:scale(0) rotate(-10deg);}60%{transform:scale(1.2) rotate(3deg);}100%{transform:scale(1) rotate(0deg);}}
+.success-h{font-family:'Anton',sans-serif;font-size:2rem;color:var(--gl);margin:16px 0 8px;line-height:1.05;}
+.success-sub{font-size:.88rem;color:var(--grey);line-height:1.7;max-width:320px;margin:0 auto 24px;}
+.success-card{background:var(--s2);border:1px solid var(--b2);border-radius:var(--r2);padding:18px;margin-bottom:20px;text-align:left;}
+.success-card-label{font-family:'Barlow Condensed',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:var(--g);margin-bottom:10px;}
+.success-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid rgba(212,148,42,.07);font-size:.83rem;}
+.success-row:last-child{border-bottom:none;}
+.success-row-k{color:var(--grey);}
+.success-row-v{color:var(--w);font-weight:500;}
+.next-steps{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+.ns{display:flex;align-items:center;gap:10px;background:var(--gfaint);border:1px solid var(--b1);border-radius:var(--r);padding:11px 13px;font-size:.82rem;color:var(--grey);}
+.ns-num{width:22px;height:22px;background:var(--g);color:var(--bg);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Anton',sans-serif;font-size:.7rem;flex-shrink:0;}
+.confetti-wrap{position:fixed;inset:0;pointer-events:none;z-index:9999;}
+.conf{position:absolute;width:8px;height:8px;border-radius:2px;animation:fall var(--d,3s) ease-out var(--dl,0s) forwards;}
+@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1;}100%{transform:translateY(100vh) rotate(720deg);opacity:0;}}
+
+/* ── STEPS ── */
+.step{display:none;}
+.step.active{display:block;}
+
+/* ── TICKER ── */
+.recent-ticker{background:var(--s2);border-bottom:1px solid var(--b1);padding:8px 28px;display:flex;align-items:center;gap:10px;font-size:.75rem;overflow:hidden;}
+.tick-label{font-family:'Barlow Condensed',sans-serif;font-weight:700;color:var(--g);white-space:nowrap;flex-shrink:0;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;}
+.tick-items{display:flex;gap:0;animation:ticker 20s linear infinite;white-space:nowrap;}
+.tick-item{color:var(--grey);padding:0 20px;flex-shrink:0;}
+.tick-item b{color:var(--w);}
+
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .page-wrap{grid-template-columns:1fr;max-width:480px;}
+  .left-panel{display:none;}
+  .right-panel{padding:24px 16px;padding-top:32px;}
+  .top-mobile-brand{display:flex;align-items:center;justify-content:space-between;padding:20px 28px 0;position:relative;z-index:1;}
+  .form-body{padding:20px 20px 24px;}
+  .step-header{padding:22px 20px 0;}
+  .step-dots{padding:14px 20px 0;}
+  .goal-cards{grid-template-columns:1fr 1fr;}
+  .db-selector{grid-template-columns:repeat(4,1fr);}
+}
+@media(min-width:901px){
+  .top-mobile-brand{display:none;}
+}
+@media(max-width:400px){
+  .field-row{grid-template-columns:1fr;}
+  .db-selector{grid-template-columns:repeat(3,1fr);}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bgCanvas"></canvas>
+
+<!-- Confetti container -->
+<div class="confetti-wrap" id="confetti"></div>
+
+<!-- Mobile brand header -->
+<div class="top-mobile-brand">
+  <div style="display:flex;align-items:center;gap:10px">
+    <span style="font-size:1.5rem">🦁</span>
+    <div>
+      <div style="font-family:'Anton',sans-serif;font-size:1.1rem;color:var(--g)">MUFASA STRENGTH</div>
+      <div style="font-size:.65rem;color:var(--grey);letter-spacing:.15em;text-transform:uppercase">Forge Your Legacy</div>
+    </div>
+  </div>
+  <a href="index.html" style="font-family:'Barlow Condensed',sans-serif;font-size:.73rem;color:var(--grey);text-decoration:none;border:1px solid var(--b1);padding:5px 11px;border-radius:4px">← Back</a>
+</div>
+
+<div class="page-wrap">
+
+  <!-- ── LEFT PANEL ── -->
+  <div class="left-panel">
+    <div>
+      <div class="brand">
+        <div class="brand-icon">🦁</div>
+        <div>
+          <div class="brand-name">MUFASA STRENGTH</div>
+          <div class="brand-tag">Equipment · Kenya</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hero-copy">
+      <div class="eyebrow">Member Registration</div>
+      <h1 class="hero-h">JOIN THE<span class="gold">PRIDE.</span></h1>
+      <p class="hero-sub">Kenya's most serious home athletes train with MUFASA. Register today and unlock free workout plans, challenge access, and member-only pricing.</p>
+
+      <div class="perks">
+        <div class="perk"><div class="perk-ic">💪</div><div><b>6 Complete Workout Plans</b> — Strength, Fat Loss, Hypertrophy & more</div></div>
+        <div class="perk"><div class="perk-ic">🥗</div><div><b>4 Kenyan Diet Plans</b> — Built around local, affordable foods</div></div>
+        <div class="perk"><div class="perk-ic">🏆</div><div><b>Monthly Challenges</b> — Compete, track progress, win prizes</div></div>
+        <div class="perk"><div class="perk-ic">🎵</div><div><b>Workout Music Playlist</b> — Curated for maximum performance</div></div>
+        <div class="perk"><div class="perk-ic">📲</div><div><b>WhatsApp Priority Access</b> — Faster order confirmation</div></div>
+      </div>
+
+      <div class="live-bar">
+        <div class="live-dot"></div>
+        <span class="live-text" id="liveCount">2,847</span>
+        <span class="live-sub">members already inside</span>
+      </div>
+    </div>
+
+    <div class="proof-strip">
+      <div class="proof-stars">★★★★★</div>
+      <div class="proof-heads">
+        <div class="ph">JM</div><div class="ph">AK</div><div class="ph">PO</div>
+        <div class="ph">WN</div><div class="ph">BO</div>
+      </div>
+      <div class="proof-txt" style="margin-top:8px"><b>"Down 12kg in 30 days."</b> The challenge accountability is what makes the difference.</div>
+    </div>
+  </div>
+
+  <!-- ── RIGHT PANEL ── -->
+  <div class="right-panel">
+    <div class="form-shell">
+
+      <!-- Recent activity ticker -->
+      <div class="recent-ticker">
+        <div class="tick-label">🔴 Live</div>
+        <div class="tick-items" id="tickItems">
+          <span class="tick-item"><b>Wanjiku N.</b> from Nairobi just joined</span>
+          <span class="tick-item"><b>Brian O.</b> ordered 20KG pair</span>
+          <span class="tick-item"><b>Amina K.</b> joined the challenge</span>
+          <span class="tick-item"><b>Peter M.</b> from Kisumu just joined</span>
+          <span class="tick-item"><b>Faith W.</b> started Fat Loss plan</span>
+          <span class="tick-item"><b>David K.</b> ordered 15KG pair</span>
+          <!-- duplicate for seamless loop -->
+          <span class="tick-item"><b>Wanjiku N.</b> from Nairobi just joined</span>
+          <span class="tick-item"><b>Brian O.</b> ordered 20KG pair</span>
+          <span class="tick-item"><b>Amina K.</b> joined the challenge</span>
+          <span class="tick-item"><b>Peter M.</b> from Kisumu just joined</span>
+          <span class="tick-item"><b>Faith W.</b> started Fat Loss plan</span>
+          <span class="tick-item"><b>David K.</b> ordered 15KG pair</span>
+        </div>
+      </div>
+
+      <!-- Progress track -->
+      <div class="prog-track"><div class="prog-fill" id="progFill" style="width:25%"></div></div>
+
+      <!-- Step dots -->
+      <div class="step-dots" id="stepDots">
+        <div class="sd active" id="dot0"></div>
+        <div class="sd" id="dot1"></div>
+        <div class="sd" id="dot2"></div>
+        <div class="sd" id="dot3"></div>
+      </div>
+
+      <!-- ══ STEP 1 — Personal Info ══ -->
+      <div class="step active" id="step-1">
+        <div class="step-header">
+          <div class="step-label">Step 1 of 4</div>
+          <div class="step-title">Who are you?</div>
+          <div class="step-sub">Your identity as a MUFASA athlete starts here.</div>
+        </div>
+        <div class="form-body">
+
+          <div class="urgency">
+            <div class="urgency-ic">⚡</div>
+            <div><span class="urgency-txt">Takes 60 seconds.</span> <span class="urgency-sub">No credit card. No spam. Cancel anytime.</span></div>
+          </div>
+
+          <div class="field field-row">
+            <div>
+              <label class="fl">First Name</label>
+              <input class="fi" id="f-fname" type="text" placeholder="e.g. James" autocomplete="given-name">
+              <div class="ferr" id="e-fname"></div>
+            </div>
+            <div>
+              <label class="fl">Last Name</label>
+              <input class="fi" id="f-lname" type="text" placeholder="e.g. Mwangi" autocomplete="family-name">
+              <div class="ferr" id="e-lname"></div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="fl">WhatsApp Number</label>
+            <input class="fi" id="f-phone" type="text" inputmode="numeric" placeholder="e.g. 0712 345 678" autocomplete="tel">
+            <div class="ferr" id="e-phone"></div>
+          </div>
+
+          <div class="field">
+            <label class="fl">Email Address <span style="color:var(--dim);font-weight:400;text-transform:none;letter-spacing:0">(optional)</span></label>
+            <input class="fi" id="f-email" type="email" placeholder="you@email.com" autocomplete="email">
+            <div class="ferr" id="e-email"></div>
+          </div>
+
+          <div class="field field-row">
+            <div>
+              <label class="fl">Town / City</label>
+              <input class="fi" id="f-city" type="text" placeholder="e.g. Nairobi" autocomplete="address-level2">
+              <div class="ferr" id="e-city"></div>
+            </div>
+            <div>
+              <label class="fl">County</label>
+              <select class="fi" id="f-county">
+                <option value="">Select...</option>
+                <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
+                <option>Nakuru</option><option>Eldoret / Uasin Gishu</option><option>Kiambu</option>
+                <option>Machakos</option><option>Nyeri</option><option>Meru</option>
+                <option>Thika / Murang'a</option><option>Kakamega</option><option>Kisii</option>
+                <option>Garissa</option><option>Embu</option><option>Other</option>
+              </select>
+            </div>
+          </div>
+
+          <button class="cta-btn" onclick="nextStep(1)" id="btn-1">
+            <span>CONTINUE →</span>
+          </button>
+
+          <div class="sec-strip">
+            <div class="sec-item">🔒 Secure &amp; Private</div>
+            <div class="sec-item">📵 No spam, ever</div>
+            <div class="sec-item">✅ Free forever</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ STEP 2 — Fitness Profile ══ -->
+      <div class="step" id="step-2">
+        <div class="step-header">
+          <div class="step-label">Step 2 of 4</div>
+          <div class="step-title">Your Goal</div>
+          <div class="step-sub">We'll personalise your plan around this.</div>
+        </div>
+        <div class="form-body">
+
+          <button class="back-btn" onclick="prevStep(2)">← Back</button>
+
+          <div class="field">
+            <label class="fl">Primary Fitness Goal</label>
+            <div class="goal-cards" id="goalCards">
+              <div class="gc" onclick="selGoal('fatloss',this)"><div class="gc-ic">🔥</div><div class="gc-nm">FAT LOSS</div><div class="gc-ds">Shred &amp; lean out</div></div>
+              <div class="gc" onclick="selGoal('strength',this)"><div class="gc-ic">💪</div><div class="gc-nm">STRENGTH</div><div class="gc-ds">Build raw power</div></div>
+              <div class="gc" onclick="selGoal('hyper',this)"><div class="gc-ic">🏗️</div><div class="gc-nm">BUILD MUSCLE</div><div class="gc-ds">Hypertrophy focus</div></div>
+              <div class="gc" onclick="selGoal('functional',this)"><div class="gc-ic">⚡</div><div class="gc-nm">FUNCTIONAL</div><div class="gc-ds">Athletic performance</div></div>
+              <div class="gc" onclick="selGoal('endurance',this)"><div class="gc-ic">🏃</div><div class="gc-nm">ENDURANCE</div><div class="gc-ds">Stamina &amp; cardio</div></div>
+              <div class="gc" onclick="selGoal('beginner',this)"><div class="gc-ic">🌱</div><div class="gc-nm">BEGINNER</div><div class="gc-ds">Just starting out</div></div>
+            </div>
+            <div class="ferr" id="e-goal"></div>
+          </div>
+
+          <div class="field field-row">
+            <div>
+              <label class="fl">Current Weight (kg)</label>
+              <input class="fi" id="f-weight" type="number" inputmode="decimal" placeholder="e.g. 78" step="0.1">
+            </div>
+            <div>
+              <label class="fl">Target Weight (kg)</label>
+              <input class="fi" id="f-target" type="number" inputmode="decimal" placeholder="e.g. 68" step="0.1">
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="fl">Experience Level</label>
+            <select class="fi" id="f-level">
+              <option value="">Select your level...</option>
+              <option value="beginner">🌱 Beginner — Under 6 months training</option>
+              <option value="intermediate">💪 Intermediate — 6 months to 2 years</option>
+              <option value="advanced">🏆 Advanced — 2+ years consistent training</option>
+            </select>
+            <div class="ferr" id="e-level"></div>
+          </div>
+
+          <div class="field">
+            <label class="fl">Days Available per Week</label>
+            <select class="fi" id="f-days">
+              <option value="">Select...</option>
+              <option value="2">2 days / week</option>
+              <option value="3">3 days / week</option>
+              <option value="4">4 days / week</option>
+              <option value="5">5 days / week</option>
+              <option value="6+">6+ days / week</option>
+            </select>
+          </div>
+
+          <button class="cta-btn" onclick="nextStep(2)" id="btn-2">
+            <span>CONTINUE →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ STEP 3 — Equipment & Purchase ══ -->
+      <div class="step" id="step-3">
+        <div class="step-header">
+          <div class="step-label">Step 3 of 4</div>
+          <div class="step-title">Your Equipment</div>
+          <div class="step-sub">What are you training with — or what are you looking to buy?</div>
+        </div>
+        <div class="form-body">
+
+          <button class="back-btn" onclick="prevStep(3)">← Back</button>
+
+          <div class="field">
+            <label class="fl">Dumbbell Weight(s) You Own / Want</label>
+            <div class="db-selector" id="dbSelector">
+              <div class="dbs" onclick="toggleDB(this,'2')"><span class="dbs-kg">2</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'4')"><span class="dbs-kg">4</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'6')"><span class="dbs-kg">6</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'8')"><span class="dbs-kg">8</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'10')"><span class="dbs-kg">10</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'12')"><span class="dbs-kg">12</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'15')"><span class="dbs-kg">15</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'20')"><span class="dbs-kg">20</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'25')"><span class="dbs-kg">25</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'30')"><span class="dbs-kg">30</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'35')"><span class="dbs-kg">35</span>KG</div>
+              <div class="dbs" onclick="toggleDB(this,'none')" style="font-size:.65rem;padding:8px 4px"><span style="font-size:.9rem;display:block;margin-bottom:2px">🛒</span>Want to buy</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="fl">Where do you train?</label>
+            <select class="fi" id="f-location">
+              <option value="">Select...</option>
+              <option value="home">🏠 Home gym</option>
+              <option value="outdoor">🌿 Outdoor / compound</option>
+              <option value="gym">🏋️ Commercial gym</option>
+              <option value="mixed">🔀 Mixed — home + gym</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="fl">Are You Interested in Purchasing Dumbbells?</label>
+            <select class="fi" id="f-purchase">
+              <option value="">Select...</option>
+              <option value="now">✅ Yes — I want to order now</option>
+              <option value="soon">🕐 Yes — within the next month</option>
+              <option value="maybe">🤔 Maybe — still exploring</option>
+              <option value="no">❌ No — I already have equipment</option>
+            </select>
+          </div>
+
+          <div id="purchase-note" style="display:none;margin-bottom:16px">
+            <div style="background:var(--greenfaint);border:1px solid rgba(34,160,80,.25);border-radius:var(--r);padding:11px 13px;font-size:.8rem;color:#25d366">
+              🎉 <strong>Excellent!</strong> After registration, we'll send your WhatsApp link to complete the order at the best price.
+            </div>
+          </div>
+
+          <div class="field" id="ref-field">
+            <label class="fl">How did you hear about us?</label>
+            <select class="fi" id="f-source">
+              <option value="">Select...</option>
+              <option value="facebook">📘 Facebook</option>
+              <option value="whatsapp">💬 WhatsApp group</option>
+              <option value="friend">👥 Friend / family referral</option>
+              <option value="google">🔍 Google Search</option>
+              <option value="instagram">📸 Instagram</option>
+              <option value="tiktok">🎵 TikTok</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <button class="cta-btn" onclick="nextStep(3)" id="btn-3">
+            <span>CONTINUE →</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══ STEP 4 — Confirm & Join ══ -->
+      <div class="step" id="step-4">
+        <div class="step-header">
+          <div class="step-label">Step 4 of 4</div>
+          <div class="step-title">Almost There!</div>
+          <div class="step-sub">Confirm your details and join the pride.</div>
+        </div>
+        <div class="form-body">
+
+          <button class="back-btn" onclick="prevStep(4)">← Back</button>
+
+          <!-- Summary card -->
+          <div class="success-card" id="summary-card" style="margin-bottom:18px">
+            <div class="success-card-label">Your Profile Summary</div>
+            <div id="summary-rows"></div>
+          </div>
+
+          <!-- Challenge opt-in -->
+          <div class="field">
+            <div class="check-row" onclick="toggleCheck('check-challenge')">
+              <div class="check-box on" id="check-challenge"></div>
+              <div class="check-txt">🏆 <b>Opt me into the current 30-Day Challenge</b> — I want to compete and track my progress</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="check-row" onclick="toggleCheck('check-whatsapp')">
+              <div class="check-box on" id="check-whatsapp"></div>
+              <div class="check-txt">💬 <b>Send me workout tips &amp; offers on WhatsApp</b> — unsubscribe anytime</div>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="check-row" onclick="toggleCheck('check-terms')">
+              <div class="check-box on" id="check-terms"></div>
+              <div class="check-txt">I agree to the <a href="#">Privacy Policy</a> and <a href="#">Terms of Use</a></div>
+            </div>
+            <div class="ferr" id="e-terms"></div>
+          </div>
+
+          <button class="cta-btn" onclick="submitReg()" id="btn-4">
+            <span>🦁 FORGE MY LEGACY →</span>
+          </button>
+
+          <div class="or-divider">or register via</div>
+
+          <a href="https://wa.me/254115228712?text=Hi!%20I%20want%20to%20register%20as%20a%20MUFASA%20member." target="_blank" class="wa-alt">
+            💬 REGISTER VIA WHATSAPP
+          </a>
+
+          <div class="sec-strip" style="margin-top:16px">
+            <div class="sec-item">🔒 Data encrypted</div>
+            <div class="sec-item">🇰🇪 Kenya-based</div>
+            <div class="sec-item">⚡ Instant access</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ SUCCESS ══ -->
+      <div id="success-screen" class="success-screen">
+        <div class="success-lion">🦁</div>
+        <div class="success-h">YOU'RE IN THE PRIDE!</div>
+        <p class="success-sub">Welcome to MUFASA Strength. Your member profile is live. The journey starts now.</p>
+
+        <div class="success-card">
+          <div class="success-card-label">Member Details</div>
+          <div id="success-detail-rows"></div>
+        </div>
+
+        <div class="next-steps">
+          <div class="ns"><div class="ns-num">1</div>Check WhatsApp — a welcome message is on its way from our team</div>
+          <div class="ns"><div class="ns-num">2</div>Visit the <b>Challenges page</b> to log your first session today</div>
+          <div class="ns"><div class="ns-num">3</div>Pick your <b>Workout Plan</b> and start Day 1 right now</div>
+        </div>
+
+        <a href="index.html#challenges" class="cta-btn" style="display:block;text-decoration:none;text-align:center;padding:15px;font-family:'Barlow Condensed',sans-serif;font-size:1rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--bg);background:linear-gradient(135deg,var(--gd),var(--gl));border-radius:var(--r);box-shadow:0 6px 20px rgba(212,148,42,.3)">
+          🏆 START YOUR CHALLENGE →
+        </a>
+
+        <div style="margin-top:12px">
+          <a href="index.html" style="font-family:'Barlow Condensed',sans-serif;font-size:.8rem;color:var(--grey);text-decoration:none">← Back to Home</a>
+        </div>
+      </div>
+
+    </div><!-- /form-shell -->
+
+    <!-- Trust logos -->
+    <div style="display:flex;justify-content:center;gap:24px;margin-top:20px;flex-wrap:wrap">
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);display:flex;align-items:center;gap:5px">🔒 SSL Secured</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);display:flex;align-items:center;gap:5px">🇰🇪 Kenya Registered</div>
+      <div style="font-family:'Barlow Condensed',sans-serif;font-size:.7rem;color:var(--dim);display:flex;align-items:center;gap:5px">⭐ 4.9/5 (847 reviews)</div>
+    </div>
+  </div>
+</div>
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+
+<script>
+// ── Firebase init ──
+let db = null;
+try {
+  firebase.initializeApp({
+    apiKey:"AIzaSyDs3UziZ9YHFKw9L8LYtM1ph3WYyaM68AU",
+    authDomain:"mufasa-strength-0719.firebaseapp.com",
+    databaseURL:"https://mufasa-strength-0719-default-rtdb.firebaseio.com",
+    projectId:"mufasa-strength-0719"
+  });
+  db = firebase.database();
+} catch(e){ console.warn('Firebase:', e); }
+
+// ── BG Canvas ──
+(function(){
+  const cv = document.getElementById('bgCanvas'), ctx = cv.getContext('2d');
+  let W, H, pts = [];
+  function rsz(){ W = cv.width = innerWidth; H = cv.height = innerHeight; }
+  rsz(); window.addEventListener('resize', rsz);
+  const COLS = ['rgba(212,148,42,','rgba(240,184,74,','rgba(168,116,31,'];
+  for(let i=0;i<60;i++) pts.push({
+    x:Math.random()*2000, y:Math.random()*2000,
+    vx:(Math.random()-.5)*.3, vy:-(Math.random()*.4+.1),
+    sz:Math.random()*1.8+.3, op:Math.random()*.5+.08,
+    c:COLS[Math.floor(Math.random()*3)]
+  });
+  function draw(){
+    ctx.clearRect(0,0,W,H);
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.y<-5)p.y=H+5; if(p.x<0)p.x=W; if(p.x>W)p.x=0;
+      const g=ctx.createRadialGradient(p.x,p.y,0,p.x,p.y,p.sz*2);
+      g.addColorStop(0,p.c+p.op+')'); g.addColorStop(1,p.c+'0)');
+      ctx.beginPath(); ctx.fillStyle=g; ctx.arc(p.x,p.y,p.sz*2,0,Math.PI*2); ctx.fill();
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+// ── Live count ──
+(function(){
+  if(db){
+    db.ref('members').once('value').then(s=>{
+      const c = s.numChildren();
+      if(c > 0) document.getElementById('liveCount').textContent = (Math.max(c, 2847)).toLocaleString();
+    }).catch(()=>{});
+  }
+  // Animate upward
+  let n = 2847;
+  setInterval(()=>{
+    n += Math.floor(Math.random()*3);
+    document.getElementById('liveCount').textContent = n.toLocaleString();
+  }, 12000);
+})();
+
+// ── State ──
+let currentStep = 1;
+let selectedGoal = '';
+let selectedDBs = new Set();
+const checks = { 'check-challenge': true, 'check-whatsapp': true, 'check-terms': true };
+
+// ── Goal select ──
+function selGoal(id, el){
+  selectedGoal = id;
+  document.querySelectorAll('.gc').forEach(c => c.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('e-goal').textContent = '';
+}
+
+// ── DB toggle ──
+function toggleDB(el, kg){
+  el.classList.toggle('sel');
+  if(el.classList.contains('sel')) selectedDBs.add(kg);
+  else selectedDBs.delete(kg);
+}
+
+// ── Checkbox ──
+function toggleCheck(id){
+  checks[id] = !checks[id];
+  const el = document.getElementById(id);
+  el.classList.toggle('on', checks[id]);
+}
+
+// ── Purchase note ──
+document.addEventListener('change', function(e){
+  if(e.target.id === 'f-purchase'){
+    const note = document.getElementById('purchase-note');
+    note.style.display = (e.target.value === 'now' || e.target.value === 'soon') ? 'block' : 'none';
+  }
+});
+
+// ── Validation ──
+function validateStep(n){
+  let valid = true;
+  const err = (id, msg) => { const el = document.getElementById(id); if(el){ el.textContent = msg; } valid = false; };
+  const clr = (id) => { const el = document.getElementById(id); if(el) el.textContent = ''; };
+  const fi  = (id) => document.getElementById(id);
+  const setOk = (id, ok) => { fi(id)?.classList.toggle('ok', ok); fi(id)?.classList.toggle('err', !ok); };
+
+  if(n === 1){
+    ['fname','lname','phone','city'].forEach(f => clr('e-'+f));
+    const fname = fi('f-fname')?.value.trim();
+    const lname = fi('f-lname')?.value.trim();
+    const phone = fi('f-phone')?.value.trim().replace(/\s/g,'');
+    const city  = fi('f-city')?.value.trim();
+    const email = fi('f-email')?.value.trim();
+
+    if(!fname || fname.length < 2){ err('e-fname','Enter your first name'); setOk('f-fname',false); }
+    else setOk('f-fname', true);
+
+    if(!lname || lname.length < 2){ err('e-lname','Enter your last name'); setOk('f-lname',false); }
+    else setOk('f-lname', true);
+
+    if(!phone || !/^(07|01|\+2547|\+2541)\d{8,9}$/.test(phone)){
+      err('e-phone','Enter a valid Kenyan number (e.g. 0712345678)'); setOk('f-phone',false);
+    } else setOk('f-phone', true);
+
+    if(email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+      err('e-email','Enter a valid email'); setOk('f-email',false);
+    } else { clr('e-email'); if(email) setOk('f-email',true); }
+
+    if(!city){ err('e-city','Enter your town or city'); setOk('f-city',false); }
+    else setOk('f-city', true);
+  }
+
+  if(n === 2){
+    if(!selectedGoal){ err('e-goal','Please select a goal'); valid = false; }
+    else clr('e-goal');
+    if(!fi('f-level')?.value){ err('e-level','Select your experience level'); valid = false; }
+    else clr('e-level');
+  }
+
+  if(n === 4){
+    if(!checks['check-terms']){ err('e-terms','Please accept the terms to continue'); valid = false; }
+    else clr('e-terms');
+  }
+
+  return valid;
+}
+
+// ── Navigation ──
+function nextStep(from){
+  if(!validateStep(from)) return;
+  if(from === 3) buildSummary();
+  animateStep(from, from+1);
+}
+function prevStep(from){ animateStep(from, from-1); }
+
+function animateStep(from, to){
+  const outEl = document.getElementById('step-'+from);
+  const inEl  = document.getElementById('step-'+to);
+  outEl.style.opacity = '0'; outEl.style.transform = 'translateX(-12px)';
+  outEl.style.transition = 'opacity .22s ease, transform .22s ease';
+  setTimeout(()=>{
+    outEl.classList.remove('active');
+    inEl.classList.add('active');
+    inEl.style.opacity = '0'; inEl.style.transform = 'translateX(14px)';
+    inEl.style.transition = 'opacity .28s ease, transform .28s ease';
+    requestAnimationFrame(()=>{
+      requestAnimationFrame(()=>{
+        inEl.style.opacity = '1'; inEl.style.transform = 'translateX(0)';
+        outEl.style.opacity = ''; outEl.style.transform = '';
+      });
+    });
+    currentStep = to;
+    updateProgress(to);
+    window.scrollTo({top:0, behavior:'smooth'});
+  }, 200);
+}
+
+function updateProgress(step){
+  const pct = step === 1 ? 25 : step === 2 ? 50 : step === 3 ? 75 : 100;
+  document.getElementById('progFill').style.width = pct + '%';
+  for(let i=0;i<4;i++){
+    const dot = document.getElementById('dot'+i);
+    dot.className = 'sd ' + (i < step-1 ? 'done' : i === step-1 ? 'active' : '');
+  }
+}
+
+// ── Summary ──
+const GOAL_LABELS = {fatloss:'🔥 Fat Loss',strength:'💪 Strength',hyper:'🏗️ Build Muscle',functional:'⚡ Functional',endurance:'🏃 Endurance',beginner:'🌱 Beginner'};
+function buildSummary(){
+  const rows = [
+    { k:'Name', v: val('f-fname') + ' ' + val('f-lname') },
+    { k:'WhatsApp', v: val('f-phone') },
+    { k:'Location', v: val('f-city') + (val('f-county') ? ', ' + val('f-county') : '') },
+    { k:'Goal', v: GOAL_LABELS[selectedGoal] || selectedGoal },
+    { k:'Experience', v: val('f-level') },
+    { k:'Equipment', v: selectedDBs.size ? [...selectedDBs].join('KG, ')+'KG' : 'None selected' },
+    { k:'Purchase Intent', v: val('f-purchase') || 'Not specified' },
+  ].filter(r => r.v && r.v.trim());
+  document.getElementById('summary-rows').innerHTML = rows.map(r =>
+    `<div class="success-row"><span class="success-row-k">${r.k}</span><span class="success-row-v">${r.v}</span></div>`
+  ).join('');
+}
+
+function val(id){ return document.getElementById(id)?.value?.trim() || ''; }
+
+// ── Submit ──
+async function submitReg(){
+  if(!validateStep(4)) return;
+  const btn = document.getElementById('btn-4');
+  btn.classList.add('loading');
+  btn.querySelector('span').innerHTML = 'SUBMITTING...';
+
+  const member = {
+    fname: val('f-fname'), lname: val('f-lname'),
+    phone: val('f-phone').replace(/\s/g,''),
+    email: val('f-email'),
+    city: val('f-city'), county: val('f-county'),
+    goal: selectedGoal, weight: val('f-weight'),
+    targetWeight: val('f-target'), level: val('f-level'),
+    daysPerWeek: val('f-days'), equipment: [...selectedDBs].join(','),
+    location: val('f-location'), purchaseIntent: val('f-purchase'),
+    source: val('f-source'),
+    challengeOptIn: checks['check-challenge'],
+    whatsappMarketing: checks['check-whatsapp'],
+    registeredAt: new Date().toISOString(),
+    _ts: Date.now()
+  };
+
+  let saved = false;
+
+  if(db){
+    try{
+      // Check for duplicate phone
+      const existing = await db.ref('members').orderByChild('phone').equalTo(member.phone).once('value');
+      if(existing.val()){
+        // Update existing record
+        const key = Object.keys(existing.val())[0];
+        await db.ref('members/'+key).update(member);
+      } else {
+        await db.ref('members').push(member);
+      }
+      // If challenge opt-in, also add to trackers
+      if(member.challengeOptIn){
+        const tSnap = await db.ref('trackers').orderByChild('phone').equalTo(member.phone).once('value');
+        if(!tSnap.val()){
+          await db.ref('trackers').push({
+            name: member.fname + ' ' + member.lname,
+            phone: member.phone, loc: member.city || member.county || '',
+            startDate: new Date().toISOString(), sessions: 0
+          });
+        }
+      }
+      saved = true;
+    }catch(e){ console.warn('Save error:', e); }
+  }
+
+  // Send WhatsApp notification to admin
+  const waMsg = `🦁 *NEW MUFASA MEMBER*\n\n` +
+    `👤 ${member.fname} ${member.lname}\n` +
+    `📱 ${member.phone}\n` +
+    `📍 ${member.city}${member.county ? ', '+member.county : ''}\n` +
+    `🎯 Goal: ${GOAL_LABELS[member.goal] || member.goal}\n` +
+    `💪 Level: ${member.level}\n` +
+    `🏋️ Equipment: ${member.equipment || 'None yet'}\n` +
+    `🛒 Purchase: ${member.purchaseIntent || '—'}\n` +
+    `🏆 Challenge: ${member.challengeOptIn ? 'YES' : 'No'}\n` +
+    `📣 Source: ${member.source || '—'}`;
+
+  // Show success
+  showSuccess(member, saved);
+
+  // Store member locally
+  try{ localStorage.setItem('muf_member', JSON.stringify(member)); }catch(e){}
+
+  // Auto-open WA notification to admin (after short delay)
+  setTimeout(()=>{
+    window.open('https://wa.me/254115228712?text='+encodeURIComponent(waMsg), '_blank');
+  }, 1800);
+}
+
+function showSuccess(member, saved){
+  // Hide all steps
+  document.querySelectorAll('.step').forEach(s => s.classList.remove('active'));
+  document.querySelector('.step-dots').style.display = 'none';
+  document.querySelector('.prog-track').querySelector('.prog-fill').style.width = '100%';
+  document.querySelector('.recent-ticker').style.display = 'none';
+
+  // Show success
+  document.getElementById('success-screen').classList.add('show');
+
+  // Populate
+  const rows = [
+    { k:'Name', v: member.fname + ' ' + member.lname },
+    { k:'WhatsApp', v: member.phone },
+    { k:'Location', v: [member.city, member.county].filter(Boolean).join(', ') },
+    { k:'Goal', v: GOAL_LABELS[member.goal] || member.goal },
+    { k:'Challenge', v: member.challengeOptIn ? '✅ Opted In' : '—' },
+    { k:'Status', v: saved ? '✅ Saved to database' : '✅ Registered' },
+  ];
+  document.getElementById('success-detail-rows').innerHTML = rows.map(r =>
+    `<div class="success-row"><span class="success-row-k">${r.k}</span><span class="success-row-v">${r.v}</span></div>`
+  ).join('');
+
+  // Confetti
+  launchConfetti();
+}
+
+function launchConfetti(){
+  const wrap = document.getElementById('confetti');
+  const colors = ['#D4942A','#F0B84A','#A8741F','#fff','#22a050'];
+  for(let i=0;i<60;i++){
+    const el = document.createElement('div');
+    el.className = 'conf';
+    el.style.cssText = `
+      left:${Math.random()*100}vw;
+      background:${colors[Math.floor(Math.random()*colors.length)]};
+      width:${4+Math.random()*8}px;
+      height:${4+Math.random()*8}px;
+      border-radius:${Math.random()>.5?'50%':'2px'};
+      --d:${2+Math.random()*3}s;
+      --dl:${Math.random()*1.2}s;
+    `;
+    wrap.appendChild(el);
+  }
+  setTimeout(()=>{ wrap.innerHTML=''; }, 6000);
+}
+
+// ── Real-time field feedback ──
+['f-fname','f-lname','f-city'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.addEventListener('blur', ()=>{
+    if(el.value.trim().length >= 2){ el.classList.add('ok'); el.classList.remove('err'); }
+  });
+});
+document.getElementById('f-phone')?.addEventListener('blur', function(){
+  const v = this.value.trim().replace(/\s/g,'');
+  const ok = /^(07|01|\+2547|\+2541)\d{8,9}$/.test(v);
+  this.classList.toggle('ok', ok); this.classList.toggle('err', !ok);
+  if(ok) document.getElementById('e-phone').textContent = '';
+});
+
+</script>
+</body>
+</html>
